@@ -1,81 +1,37 @@
+#include <Arduino.h>
 #include <ArduinoMotorCarrier.h>
 
-static const int moisturePin = A2;
-
-static float moistureData;
-static int moistureLimit = 30; // Unclear what is the real limit for the specific plant
-
-static float batteryVoltage;
-static float lowBatteryLimit = lowBatteryLimit = 5.00; // currently a 9v battery, should be changed for a better power supply
-
-float getBatteryVoltage()
-{
-    batteryVoltage = (float) battery.getRaw() / 77;
-    return batteryVoltage;
-}
-
-void logBatteryVoltage(float batteryVoltage)
-{
-    Serial.print("Battery voltage: ");
-    Serial.println(batteryVoltage);
-}
-
-int getMoistureData()
-{
-    moistureData = map(analogRead(moisturePin), 1023, 165, 100, 0);
-    moistureData = constrain(moistureData, 0, 100);
-    return moistureData;
-}
-
-void logMoistureData(int moistureData)
-{
-    Serial.print("Soil moisture: ");
-    Serial.print(moistureData);
-    Serial.println("%");
-}
-
-void stopAllMotors()
-{
-    M1.setDuty(0);
-    M2.setDuty(0);
-    M3.setDuty(0);
-    M4.setDuty(0);
-}
+#include "src/Battery.h"
+#include "src/MoistureSensor.h"
+#include "src/PeristalticPump.h"
 
 
 void setup()
 {
-    Serial.begin(9600);
-    delay(1500);
+	Serial.begin(9600);
+	delay(1500);
+	Serial.println("OK");
 
-    controller.begin();
-    controller.reboot();
-    delay(500);
-
-    stopAllMotors();
+	PeristalticPump::setup();
 }
 
 void loop()
 {
-    moistureData = getMoistureData();
-    logMoistureData(moistureData);
 
-    batteryVoltage = getBatteryVoltage();
-    logBatteryVoltage(batteryVoltage);
+	MoistureSensor::logData();
+	Battery::logVoltage();
 
-    if (batteryVoltage < lowBatteryLimit)
-    {
-        stopAllMotors();
-    } else
-    {
-        if (moistureData < moistureLimit)
-        {
-            M1.setDuty(30);
-            delay(2000);
-            M1.setDuty(0);
-        }
-    }
+	if (Battery::hasCapacity())
+	{
+		PeristalticPump::stopMotors();
+	} else 
+	{
+		if (!MoistureSensor::isDry())
+		{
+			PeristalticPump::activateMotor(30,2000);
+		}
+	}
 
-    controller.ping();
-    delay(1000 * 60); // 1 hour
-}
+	PeristalticPump::ping();
+	delay(1000);
+};
