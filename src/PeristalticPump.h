@@ -1,5 +1,4 @@
-# ifndef PERISTALTIC_PUMP_H
-# define PERISTALTIC_PUMP_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoMotorCarrier.h>
@@ -17,6 +16,3 @@ private:
 	// static d21::DCMotor _motors [4] = {M1, M2, M3, M4};
 	// static mc::DCMotor _motors [4] = {M1, M2, M3, M4};
 };
-
-
-# endif

@@ -1,5 +1,4 @@
-# ifndef BATTERY_H
-# define BATTERY_H
+#pragma once
 
 #include <Arduino.h>
 #include <ArduinoMotorCarrier.h>
@@ -17,5 +16,3 @@ private:
 	static float _voltage;
 	Battery();
 };
-
-# endif

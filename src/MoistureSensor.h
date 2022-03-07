@@ -1,5 +1,4 @@
-# ifndef MOISTURE_SENSOR_H
-# define MOISTURE_SENSOR_H
+#pragma once
 
 #include <Arduino.h>
 
@@ -15,5 +14,3 @@ private:
 	static float _data;
 	MoistureSensor();
 };
-
-# endif
